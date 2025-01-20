@@ -1,18 +1,29 @@
-import React, { useState, useEffect, useRef } from "react";
+// src/components/GameScreen/GameScreen.js
+
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { Howl, Howler } from "howler";
+import { GameContext } from '../../context/GameContext'; // Import GameContext
 
 const ROWS = [30, 50, 70]; // Three fixed row positions
 
 const GameScreen = ({ song, level, onGameOver }) => {
-  const [score, setScore] = useState(0);
   const [playerRow, setPlayerRow] = useState(1); // Middle row by default
   const [isPlaying, setIsPlaying] = useState(false);
   const [obstacles, setObstacles] = useState([]);
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
   const soundRef = useRef(null);
+  
+  const {
+    totalScore,
+    addScore,
+    incrementMissedObstacles,
+    missedObstacles,
+    resetGame
+  } = useContext(GameContext); // Destructure necessary functions
 
+  // Function to detect peaks in the music frequency
   const detectPeaks = () => {
     if (!analyserRef.current) return;
 
@@ -33,6 +44,7 @@ const GameScreen = ({ song, level, onGameOver }) => {
     setTimeout(() => requestAnimationFrame(detectPeaks), 500); // Slower detection for better rhythm matching
   };
 
+  // Function to start the game and play the music
   const startGame = () => {
     const sound = new Howl({
       src: [song],
@@ -62,7 +74,7 @@ const GameScreen = ({ song, level, onGameOver }) => {
       },
       onend: () => {
         console.log("Level completed!");
-        onGameOver(true);
+        onGameOver(true); // Level completed successfully
       },
     });
 
@@ -85,11 +97,11 @@ const GameScreen = ({ song, level, onGameOver }) => {
   useEffect(() => {
     obstacles.forEach((obstacle) => {
       if (obstacle.position < 15 && obstacle.row === playerRow) {
-        setScore((prevScore) => prevScore + 10);
+        addScore(10); // Adds 10 points to totalScore
         setObstacles((prevObstacles) => prevObstacles.filter((o) => o.id !== obstacle.id));
       }
     });
-  }, [obstacles, playerRow]);
+  }, [obstacles, playerRow, addScore]);
 
   // Update obstacles movement
   useEffect(() => {
@@ -101,14 +113,34 @@ const GameScreen = ({ song, level, onGameOver }) => {
               ...obstacle,
               position: obstacle.position - 2,  // Adjust speed for better visibility
             }))
-            .filter((obstacle) => obstacle.position > -10)
+            .filter((obstacle) => {
+              if (obstacle.position <= 0) {
+                // Obstacle passed without being hit
+                incrementMissedObstacles(); // Increments missedObstacles by 1
+                return false;
+              }
+              return true;
+            })
         );
       }, 50);
 
       return () => clearInterval(interval);
     }
-  }, [isPlaying]);
+  }, [isPlaying, incrementMissedObstacles]);
 
+  // Check if missedObstacles >= 15 to trigger game over
+  useEffect(() => {
+    if (missedObstacles >= 15) {
+      // Stop the music when the player fails
+      if (soundRef.current) {
+        soundRef.current.stop();
+      }
+      alert("You missed too many obstacles. Game Over.");
+      onGameOver(false); // Trigger game over
+    }
+  }, [missedObstacles, onGameOver]);
+
+  // Handle player movement event listeners
   useEffect(() => {
     if (isPlaying) {
       window.addEventListener("keydown", handlePlayerMove);
@@ -116,18 +148,27 @@ const GameScreen = ({ song, level, onGameOver }) => {
     }
   }, [isPlaying, playerRow]);
 
+  // Reset game state when level changes
   useEffect(() => {
-  if (isPlaying) {
-    // Stop the current game and reset state for the new level
-    if (soundRef.current) {
-      soundRef.current.stop();
+    if (isPlaying) {
+      if (soundRef.current) {
+        soundRef.current.stop();
+      }
+      setIsPlaying(false);
+      setObstacles([]);
+      setPlayerRow(1); // Reset player to middle row
+      // Optionally reset other states if necessary
     }
-    setIsPlaying(false);
-    setObstacles([]);
-    setScore(0);
-  }
-}, [level]);
+  }, [level]);
 
+  // Cleanup on component unmount to stop music
+  useEffect(() => {
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.stop();
+      }
+    };
+  }, []);
 
   return (
     <Box
@@ -150,7 +191,7 @@ const GameScreen = ({ song, level, onGameOver }) => {
         </Button>
       ) : (
         <>
-          <Typography variant="h4">Score: {score}</Typography>
+          <Typography variant="h4">Score: {totalScore}</Typography> {/* Display Global Score */}
 
           {/* Player Block in the 3-row system */}
           <Box
