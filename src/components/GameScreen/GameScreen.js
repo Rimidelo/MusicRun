@@ -60,7 +60,10 @@ const GameScreen = ({ song, level, onGameOver }) => {
 
         setTimeout(() => detectPeaks(), 1000);
       },
-      onend: () => onGameOver(true),
+      onend: () => {
+        console.log("Level completed!");
+        onGameOver(true);
+      },
     });
 
     sound.play();
@@ -112,6 +115,19 @@ const GameScreen = ({ song, level, onGameOver }) => {
       return () => window.removeEventListener("keydown", handlePlayerMove);
     }
   }, [isPlaying, playerRow]);
+
+  useEffect(() => {
+  if (isPlaying) {
+    // Stop the current game and reset state for the new level
+    if (soundRef.current) {
+      soundRef.current.stop();
+    }
+    setIsPlaying(false);
+    setObstacles([]);
+    setScore(0);
+  }
+}, [level]);
+
 
   return (
     <Box
