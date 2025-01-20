@@ -6,7 +6,7 @@ import { GameContext } from '../../context/GameContext';
 import { useNavigate } from 'react-router-dom';
 
 const ScoreDisplay = () => {
-  const { totalScore, missedObstacles, resetGame } = useContext(GameContext);
+  const { totalScore, resetGame } = useContext(GameContext); // Removed missedObstacles
   const navigate = useNavigate();
 
   const handleRestart = () => {
@@ -34,14 +34,13 @@ const ScoreDisplay = () => {
       }}
     >
       <Typography variant="h3" gutterBottom>
-        Game Over
+        { /* Optional: Display Game Outcome */ }
+        Game { /* You can conditionally render "Over" or "Completed" */ }
       </Typography>
       <Typography variant="h5">
         Total Score: {totalScore}
       </Typography>
-      <Typography variant="h5">
-        Missed Obstacles: {missedObstacles}
-      </Typography>
+      { /* Removed Missed Obstacles Display */ }
       <Box sx={{ mt: 4 }}>
         <Button
           variant="contained"

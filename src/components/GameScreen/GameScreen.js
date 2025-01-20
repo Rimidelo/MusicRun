@@ -20,8 +20,9 @@ const GameScreen = ({ song, level, onGameOver }) => {
     addScore,
     incrementMissedObstacles,
     missedObstacles,
-    resetGame
-  } = useContext(GameContext); // Destructure necessary functions
+    remainingMisses, // Destructure remainingMisses
+    MAX_MISSES,
+  } = useContext(GameContext); // Destructure necessary functions and variables
 
   // Function to detect peaks in the music frequency
   const detectPeaks = () => {
@@ -74,6 +75,9 @@ const GameScreen = ({ song, level, onGameOver }) => {
       },
       onend: () => {
         console.log("Level completed!");
+        if (soundRef.current) {
+          soundRef.current.stop();
+        }
         onGameOver(true); // Level completed successfully
       },
     });
@@ -128,9 +132,9 @@ const GameScreen = ({ song, level, onGameOver }) => {
     }
   }, [isPlaying, incrementMissedObstacles]);
 
-  // Check if missedObstacles >= 15 to trigger game over
+  // Check if missedObstacles >= MAX_MISSES to trigger game over
   useEffect(() => {
-    if (missedObstacles >= 15) {
+    if (missedObstacles >= MAX_MISSES) {
       // Stop the music when the player fails
       if (soundRef.current) {
         soundRef.current.stop();
@@ -138,7 +142,7 @@ const GameScreen = ({ song, level, onGameOver }) => {
       alert("You missed too many obstacles. Game Over.");
       onGameOver(false); // Trigger game over
     }
-  }, [missedObstacles, onGameOver]);
+  }, [missedObstacles, onGameOver, MAX_MISSES]);
 
   // Handle player movement event listeners
   useEffect(() => {
@@ -185,6 +189,24 @@ const GameScreen = ({ song, level, onGameOver }) => {
         flexDirection: "column",
       }}
     >
+      { /* Display Remaining Misses in Top-Left Corner */ }
+      {isPlaying && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            padding: "8px 16px",
+            borderRadius: "8px",
+          }}
+        >
+          <Typography variant="subtitle1" sx={{color: 'white'}}>
+            Remaining Misses: {remainingMisses}
+          </Typography>
+        </Box>
+      )}
+
       {!isPlaying ? (
         <Button variant="contained" color="primary" size="large" onClick={startGame}>
           Start Level {level}
