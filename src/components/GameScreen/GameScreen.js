@@ -139,7 +139,7 @@ const GameScreen = ({ song, level, onGameOver }) => {
       if (soundRef.current) {
         soundRef.current.stop();
       }
-      alert("You missed too many obstacles. Game Over.");
+      // alert("You missed too many obstacles. Game Over."); // Removed alert
       onGameOver(false); // Trigger game over
     }
   }, [missedObstacles, onGameOver, MAX_MISSES]);
@@ -201,7 +201,7 @@ const GameScreen = ({ song, level, onGameOver }) => {
             borderRadius: "8px",
           }}
         >
-          <Typography variant="subtitle1" sx={{color: 'white'}}>
+          <Typography variant="subtitle1">
             Remaining Misses: {remainingMisses}
           </Typography>
         </Box>

@@ -23,11 +23,11 @@ const LevelScreen = () => {
       if (parseInt(levelId) < 4) {
         navigate(`/level/${parseInt(levelId) + 1}`);
       } else {
-        alert("Congratulations! You won the game!");
+        // alert("Congratulations! You won the game!"); // Optional: Remove if desired
         navigate("/score"); // Navigate to ScoreDisplay after last level
       }
     } else {
-      alert("Game Over. Redirecting to score page.");
+      // alert("Game Over. Redirecting to score page."); // Removed alert
       navigate("/score"); // Navigate to ScoreDisplay on game over
     }
   };
