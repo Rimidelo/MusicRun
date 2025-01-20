@@ -1,14 +1,21 @@
-import React from 'react';
-// import RhythmRunnerGame from './RhythmRunnerGame';
-import RhythmRunnerGame from './RhythmRunnerGame';
+import React from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import OpeningScreen from "./components/OpeningScreen/OpeningScreen";
+import GameScreen from "./components/GameScreen/GameScreen";
+import LevelScreen from "./components/LevelScreen/LevelScreen";
+import { CssBaseline } from "@mui/material";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <h1>Rhythm Runner Prototype</h1>
-      <RhythmRunnerGame  />
-    </div>
+    <>
+      <CssBaseline />
+      <Routes>
+        <Route path="/" element={<OpeningScreen />} />
+        <Route path="/game" element={<GameScreen />} />
+        <Route path="/level/:levelId" element={<LevelScreen />} />
+      </Routes>
+    </>
   );
-}
+};
 
 export default App;
