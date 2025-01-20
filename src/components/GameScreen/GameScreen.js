@@ -22,7 +22,7 @@ const GameScreen = ({ song, level, onGameOver }) => {
       dataArrayRef.current.length;
     console.log(avgFreq);
 
-    if (avgFreq > 80) {  // Adjust the threshold for obstacle generation sensitivity
+    if (avgFreq > 30) {  // Adjust the threshold for obstacle generation sensitivity
       console.log("Peak detected! Adding obstacle.");
       setObstacles((prevObstacles) => [
         ...prevObstacles,
