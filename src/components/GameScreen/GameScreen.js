@@ -38,7 +38,7 @@ const GameScreen = ({ song, level, onGameOver }) => {
       src: [song],
       html5: true,
       autoplay: false,
-      loop: true,
+      loop: false,
       volume: 0.5,
       onplay: () => {
         console.log("Music started!");
@@ -77,6 +77,16 @@ const GameScreen = ({ song, level, onGameOver }) => {
       setPlayerRow(playerRow + 1);
     }
   };
+
+  // Check collision and update score
+  useEffect(() => {
+    obstacles.forEach((obstacle) => {
+      if (obstacle.position < 15 && obstacle.row === playerRow) {
+        setScore((prevScore) => prevScore + 10);
+        setObstacles((prevObstacles) => prevObstacles.filter((o) => o.id !== obstacle.id));
+      }
+    });
+  }, [obstacles, playerRow]);
 
   // Update obstacles movement
   useEffect(() => {
